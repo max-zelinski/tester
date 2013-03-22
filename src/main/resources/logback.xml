@@ -1,0 +1,67 @@
+<configuration>
+    <property name="defaultPattern" value="[%date{ISO8601}] [%-5level] [%logger{36}] - %msg%n" />
+    <timestamp key="bySecond" datePattern="yyyyMMdd"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>return event.getLoggerName().contains("ru.smply.tester");</expression>
+            </evaluator>
+            <OnMatch>NEUTRAL</OnMatch>
+            <OnMismatch>DENY</OnMismatch>
+        </filter>
+        <encoder>
+            <pattern>${defaultPattern}</pattern>
+            <outputPatternAsHeader>false</outputPatternAsHeader>
+        </encoder>
+    </appender>
+
+    <appender name="FILE_ALL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${tester.logs:-logs}/${TESTER_TYPE}.all.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${tester.logs:-logs}/${TESTER_TYPE}.all.${bySecond}.%i.log</fileNamePattern>
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>5MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <pattern>${defaultPattern}</pattern>
+            <outputPatternAsHeader>false</outputPatternAsHeader>
+        </encoder>
+    </appender>
+
+    <appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${tester.logs:-logs}/${TESTER_TYPE}.info.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>return event.getLoggerName().contains("ru.smply.tester");</expression>
+            </evaluator>
+            <OnMatch>NEUTRAL</OnMatch>
+            <OnMismatch>DENY</OnMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${tester.logs:-logs}/${TESTER_TYPE}.info.${bySecond}.%i.log</fileNamePattern>
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>5MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <pattern>${defaultPattern}</pattern>
+            <outputPatternAsHeader>false</outputPatternAsHeader>
+        </encoder>
+    </appender>
+
+    <root>
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE_ALL" />
+        <appender-ref ref="FILE_INFO" />
+    </root>
+</configuration>
